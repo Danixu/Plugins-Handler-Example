@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(lldb-mac) Launch",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/subprojects/Build/popstationmdg_core/popstationmdg.app",
+            "preLaunchTask": "Build with CMake"
+        },
+        {
+            "name": "(lldb-linux) Launch",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/subprojects/Build/popstationmdg_core/popstationmdg",
+            "preLaunchTask": "Build with CMake"
+        },
+        {
+            "name": "(msvc) Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\build\\subprojects\\Build\\popstationmdg_core\\Debug\\popstationmdg.exe",
+            "preLaunchTask": "Build with CMake"
+        }
+    ]
+}
