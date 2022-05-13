@@ -36,6 +36,11 @@ int main()
     {
         std::cerr << "Loading plugin..." << std::endl;
         auto plugin = ph.load();
+        if (plugin == NULL)
+        {
+            fprintf(stderr, "The plugin is not loaded correctly\n");
+            continue;
+        }
         std::cerr << "Plugin loaded" << std::endl;
         std::cerr << "Auto loaded plugin: " << ph.get_name() << ", version: " << ph.get_version() << std::endl;
         std::cerr << "Running plugins command method: " << std::endl;
