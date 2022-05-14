@@ -7,9 +7,15 @@
 #include <vector>
 #include "plugin_handler.hpp"
 
+#ifdef _WIN32
+#define EXT ".dll"
+#else
+#define EXT ".so"
+#endif
+
 int main()
 {
-    auto plugins = load_plugins("plugins/", ".so");
+    auto plugins = load_plugins("plugins/", EXT);
     for (auto ph : plugins)
     {
         fprintf(stderr, "\n\nLoading plugin...\n");

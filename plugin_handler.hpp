@@ -115,7 +115,6 @@ std::vector<PluginHandler> load_plugins(std::string path, std::string extension)
 
     for (auto &p : std::filesystem::recursive_directory_iterator(path))
     {
-        fprintf(stderr, "%s\n", p.path().c_str());
         if (p.path().extension() == extension)
         {
             PluginHandler plugin = PluginHandler(p.path());
