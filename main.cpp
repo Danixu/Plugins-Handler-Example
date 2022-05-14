@@ -9,19 +9,27 @@
 #include <dirent.h>
 #include "plugin_handler.hpp"
 
-std::vector<PluginHandler> load_plugins()
+std::vector<PluginHandler> load_plugins(std::string path)
 {
     std::vector<PluginHandler> plugins;
 
     DIR *dir;
     struct dirent *ent;
-    if ((dir = opendir("plugins/")) != NULL)
+    if ((dir = opendir(path.c_str())) != NULL)
     {
         while ((ent = readdir(dir)) != NULL)
         {
             if (ent->d_name[0] != '.')
             {
-                plugins.push_back(PluginHandler("plugins/" + std::string(ent->d_name)));
+                PluginHandler plugin = PluginHandler(path + std::string(ent->d_name));
+                if (!plugin.has_error())
+                {
+                    plugins.push_back(plugin);
+                }
+                else
+                {
+                    fprintf(stderr, "There was an error loading the plugin plugins/%s\n", std::string(ent->d_name).c_str());
+                }
             }
         }
         closedir(dir);
@@ -31,7 +39,7 @@ std::vector<PluginHandler> load_plugins()
 
 int main()
 {
-    auto plugins = load_plugins();
+    auto plugins = load_plugins("plugins/");
     for (auto ph : plugins)
     {
         std::cerr << "Loading plugin..." << std::endl;

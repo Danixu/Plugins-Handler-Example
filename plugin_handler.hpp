@@ -8,8 +8,7 @@ class PluginHandler
     void *handle = NULL;
     char *(*_get_name)() = NULL;
     char *(*_get_version)() = NULL;
-
-    char *error = NULL;
+    char *last_error = NULL;
 
     std::shared_ptr<Plugin> instance;
 
@@ -18,36 +17,36 @@ public:
     {
         handle = dlopen(name.c_str(), RTLD_LAZY);
 
-        if (!handle || ((error = dlerror()) != NULL))
+        if (!handle || ((last_error = dlerror()) != NULL))
         {
-            if (error == NULL)
+            if (last_error == NULL)
             {
-                error = (char *)"Handler is empty. Maybe the library file is damaged.";
+                last_error = (char *)"Handler is empty. Maybe the library file is damaged.";
             }
-            fprintf(stderr, "There was an error loading the %s lib:\n%s\n", name.c_str(), error);
+            fprintf(stderr, "There was an error loading the %s lib:\n%s\n", name.c_str(), last_error);
             return;
         }
 
         dlerror(); /* Clear any existing error */
 
         _load = (std::shared_ptr<Plugin>(*)())dlsym(handle, "load");
-        if ((error = dlerror()) != NULL)
+        if ((last_error = dlerror()) != NULL)
         {
-            fprintf(stderr, "Error getting the load symbol in the %s lib:\n%s\n", name.c_str(), error);
+            fprintf(stderr, "Error getting the load symbol in the %s lib:\n%s\n", name.c_str(), last_error);
             return;
         }
 
         _get_name = (char *(*)())dlsym(handle, "name");
-        if ((error = dlerror()) != NULL)
+        if ((last_error = dlerror()) != NULL)
         {
-            fprintf(stderr, "Error getting the name symbol in the %s lib:\n%s\n", name.c_str(), error);
+            fprintf(stderr, "Error getting the name symbol in the %s lib:\n%s\n", name.c_str(), last_error);
             return;
         }
 
         _get_version = (char *(*)())dlsym(handle, "version");
-        if ((error = dlerror()) != NULL)
+        if ((last_error = dlerror()) != NULL)
         {
-            fprintf(stderr, "Error getting the version symbol in the %s lib:\n%s\n", name.c_str(), error);
+            fprintf(stderr, "Error getting the version symbol in the %s lib:\n%s\n", name.c_str(), last_error);
             return;
         }
     }
@@ -79,5 +78,32 @@ public:
         }
 
         return instance;
+    }
+
+    bool has_error()
+    {
+        if (last_error != NULL)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    char *get_error()
+    {
+        if (last_error == NULL)
+        {
+            return (char *)'\0';
+        }
+        else
+        {
+            return last_error;
+        }
+    }
+
+    // Use it under your risk... If an error was set maybe something happens.
+    void clear_error()
+    {
+        last_error = NULL;
     }
 };
