@@ -9,7 +9,7 @@
 
 int main()
 {
-    auto plugins = load_plugins("plugins/");
+    auto plugins = load_plugins("plugins/", ".so");
     for (auto ph : plugins)
     {
         fprintf(stderr, "\n\nLoading plugin...\n");

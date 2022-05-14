@@ -1,7 +1,7 @@
 #include <dlfcn.h>
 #include <string>
 #include "plugin.hpp"
-#include <dirent.h>
+#include <filesystem>
 
 class PluginHandler
 {
@@ -109,30 +109,26 @@ public:
     }
 };
 
-std::vector<PluginHandler> load_plugins(std::string path)
+std::vector<PluginHandler> load_plugins(std::string path, std::string extension)
 {
     std::vector<PluginHandler> plugins;
 
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir(path.c_str())) != NULL)
+    for (auto &p : std::filesystem::recursive_directory_iterator(path))
     {
-        while ((ent = readdir(dir)) != NULL)
+        fprintf(stderr, "%s\n", p.path().c_str());
+        if (p.path().extension() == extension)
         {
-            if (ent->d_name[0] != '.')
+            PluginHandler plugin = PluginHandler(p.path());
+            if (!plugin.has_error())
             {
-                PluginHandler plugin = PluginHandler(path + std::string(ent->d_name));
-                if (!plugin.has_error())
-                {
-                    plugins.push_back(plugin);
-                }
-                else
-                {
-                    fprintf(stderr, "There was an error loading the plugin plugins/%s\n", std::string(ent->d_name).c_str());
-                }
+                plugins.push_back(plugin);
+            }
+            else
+            {
+                fprintf(stderr, "There was an error loading the plugin %s\n", p.path().c_str());
             }
         }
-        closedir(dir);
     }
+
     return plugins;
 }
