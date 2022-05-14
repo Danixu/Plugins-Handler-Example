@@ -19,17 +19,17 @@ public:
 #define DEFINE_PLUGIN(classType, pluginName, pluginVersion) \
     extern "C"                                              \
     {                                                       \
-        std::shared_ptr<Plugin> load()                      \
+        std::shared_ptr<Plugin> SHARED_EXPORT load()        \
         {                                                   \
             return std::make_shared<classType>();           \
         }                                                   \
                                                             \
-        const char *name()                                  \
+        const char SHARED_EXPORT *name()                    \
         {                                                   \
             return pluginName;                              \
         }                                                   \
                                                             \
-        const char *version()                               \
+        const char SHARED_EXPORT *version()                 \
         {                                                   \
             return pluginVersion;                           \
         }                                                   \
