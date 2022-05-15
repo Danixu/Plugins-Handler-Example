@@ -18,7 +18,7 @@ int main()
     auto plugins = load_plugins("plugins/", EXT);
     for (auto ph : plugins)
     {
-        fprintf(stderr, "\n\nLoading plugin...\n");
+        fprintf(stderr, "Loading plugin...\n");
         auto plugin = ph.load();
         if (plugin == NULL)
         {

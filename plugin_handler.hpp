@@ -1,4 +1,3 @@
-#include <dlfcn.h>
 #include <string>
 #include "plugin.hpp"
 #include <filesystem>
@@ -16,10 +15,17 @@ class PluginHandler
 public:
     PluginHandler(std::string name)
     {
-        handle = dlopen(name.c_str(), RTLD_LAZY);
-
+        handle = LIBLOAD(name.c_str());
         if (!handle || ((last_error = dlerror()) != NULL))
         {
+            // Maybe the last_error variable is NULL because the handler is empty directly.
+            // In that case, try to return the error again
+            if (last_error == NULL)
+            {
+                last_error = dlerror();
+            }
+
+            // If the error still null here, then just add a general error text
             if (last_error == NULL)
             {
                 last_error = (char *)"Handler is empty. Maybe the library file is damaged.";
@@ -75,7 +81,9 @@ public:
     {
         if (!instance && _load != NULL)
         {
+            fprintf(stderr, "Iniatilizing the class %d\n", _load);
             instance = _load();
+            fprintf(stderr, "Initialized...\n");
         }
 
         return instance;
@@ -117,14 +125,14 @@ std::vector<PluginHandler> load_plugins(std::string path, std::string extension)
     {
         if (p.path().extension() == extension)
         {
-            PluginHandler plugin = PluginHandler(p.path());
+            PluginHandler plugin = PluginHandler(p.path().string());
             if (!plugin.has_error())
             {
                 plugins.push_back(plugin);
             }
             else
             {
-                fprintf(stderr, "There was an error loading the plugin %s\n", p.path().c_str());
+                fprintf(stderr, "There was an error loading the plugin %s\n", p.path().string().c_str());
             }
         }
     }
