@@ -65,18 +65,18 @@ public:
 
     ~PluginHandler()
     {
-        printf("Cleaning up the house\n");
-        unload();
-        if (handle != NULL)
-        {
-            dlclose(handle);
-        }
         if (last_error != NULL)
         {
             delete[] last_error;
         }
 
-        printf("Cleaned...\n");
+        /*
+        if (handle != NULL)
+        {
+            dlclose(handle);
+            handle = NULL;
+        }
+        */
     }
 
     std::string get_name()
@@ -93,9 +93,7 @@ public:
     {
         if (_load != NULL)
         {
-            fprintf(stderr, "Iniatilizing the class\n");
-            instance = std::shared_ptr<Plugin>(_load());
-            fprintf(stderr, "Class initialized...\n");
+            instance = std::shared_ptr<Plugin>(_load(), _unload);
             return instance;
         }
 
@@ -106,9 +104,7 @@ public:
     {
         if (_unload != NULL)
         {
-            fprintf(stderr, "Uniniatilizing the class\n");
             _unload(instance.get());
-            fprintf(stderr, "Done\n");
         }
     }
 

@@ -31,7 +31,7 @@ int main()
         fprintf(stderr, "Running plugins command method:\n");
         fprintf(stderr, "%s\n", plugin->command("Command here", "options here").c_str());
 
-        // delete ph;
+        delete ph;
     }
 
     return 0;
