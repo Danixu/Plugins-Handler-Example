@@ -1,13 +1,19 @@
 #include <string>
 #include "plugin.hpp"
 #include <filesystem>
+#include <memory>
 
 class PluginHandler
 {
-    std::shared_ptr<Plugin> (*_load)() = NULL;
-    void *handle = NULL;
-    char *(*_get_name)() = NULL;
-    char *(*_get_version)() = NULL;
+    using allocClass = Plugin *(*)();
+    using deleteClass = void (*)(Plugin *);
+    using charPReturn = char *(*)();
+
+    allocClass _load = NULL;
+    deleteClass _unload = NULL;
+    void *handle;
+    charPReturn _get_name = NULL;
+    charPReturn _get_version = NULL;
     char *last_error = NULL;
 
     std::shared_ptr<Plugin> instance;
@@ -15,15 +21,9 @@ class PluginHandler
 public:
     PluginHandler(std::string name)
     {
-        handle = LIBLOAD(name.c_str());
-        if (!handle || ((last_error = dlerror()) != NULL))
+        if (!(handle = LIBLOAD(name.c_str())))
         {
-            // Maybe the last_error variable is NULL because the handler is empty directly.
-            // In that case, try to return the error again
-            if (last_error == NULL)
-            {
-                last_error = dlerror();
-            }
+            last_error = dlerror();
 
             // If the error still null here, then just add a general error text
             if (last_error == NULL)
@@ -34,23 +34,28 @@ public:
             return;
         }
 
-        dlerror(); /* Clear any existing error */
-
-        _load = (std::shared_ptr<Plugin>(*)())dlsym(handle, "load");
+        _load = reinterpret_cast<allocClass>(dlsym(handle, "load"));
         if ((last_error = dlerror()) != NULL)
         {
             fprintf(stderr, "Error getting the load symbol in the %s lib:\n%s\n", name.c_str(), last_error);
             return;
         }
 
-        _get_name = (char *(*)())dlsym(handle, "name");
+        _unload = reinterpret_cast<deleteClass>(dlsym(handle, "unload"));
+        if ((last_error = dlerror()) != NULL)
+        {
+            fprintf(stderr, "Error getting the load symbol in the %s lib:\n%s\n", name.c_str(), last_error);
+            return;
+        }
+
+        _get_name = reinterpret_cast<charPReturn>(dlsym(handle, "name"));
         if ((last_error = dlerror()) != NULL)
         {
             fprintf(stderr, "Error getting the name symbol in the %s lib:\n%s\n", name.c_str(), last_error);
             return;
         }
 
-        _get_version = (char *(*)())dlsym(handle, "version");
+        _get_version = reinterpret_cast<charPReturn>(dlsym(handle, "version"));
         if ((last_error = dlerror()) != NULL)
         {
             fprintf(stderr, "Error getting the version symbol in the %s lib:\n%s\n", name.c_str(), last_error);
@@ -60,11 +65,18 @@ public:
 
     ~PluginHandler()
     {
-        instance.reset();
+        printf("Cleaning up the house\n");
+        unload();
         if (handle != NULL)
         {
             dlclose(handle);
         }
+        if (last_error != NULL)
+        {
+            delete[] last_error;
+        }
+
+        printf("Cleaned...\n");
     }
 
     std::string get_name()
@@ -79,14 +91,25 @@ public:
 
     std::shared_ptr<Plugin> load()
     {
-        if (!instance && _load != NULL)
+        if (_load != NULL)
         {
-            fprintf(stderr, "Iniatilizing the class %d\n", _load);
-            instance = _load();
-            fprintf(stderr, "Initialized...\n");
+            fprintf(stderr, "Iniatilizing the class\n");
+            instance = std::shared_ptr<Plugin>(_load());
+            fprintf(stderr, "Class initialized...\n");
+            return instance;
         }
 
-        return instance;
+        return NULL;
+    }
+
+    void unload()
+    {
+        if (_unload != NULL)
+        {
+            fprintf(stderr, "Uniniatilizing the class\n");
+            _unload(instance.get());
+            fprintf(stderr, "Done\n");
+        }
     }
 
     bool has_error()
@@ -113,20 +136,21 @@ public:
     // Use it under your risk... If an error was set maybe something happens.
     void clear_error()
     {
+        delete[] last_error;
         last_error = NULL;
     }
 };
 
-std::vector<PluginHandler> load_plugins(std::string path, std::string extension)
+std::vector<PluginHandler *> load_plugins(std::string path, std::string extension)
 {
-    std::vector<PluginHandler> plugins;
+    std::vector<PluginHandler *> plugins;
 
     for (auto &p : std::filesystem::recursive_directory_iterator(path))
     {
         if (p.path().extension() == extension)
         {
-            PluginHandler plugin = PluginHandler(p.path().string());
-            if (!plugin.has_error())
+            PluginHandler *plugin = new PluginHandler(p.path().string());
+            if (!plugin->has_error())
             {
                 plugins.push_back(plugin);
             }

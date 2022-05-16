@@ -15,20 +15,24 @@
 
 int main()
 {
+
     auto plugins = load_plugins("plugins/", EXT);
     for (auto ph : plugins)
     {
         fprintf(stderr, "Loading plugin...\n");
-        auto plugin = ph.load();
+        auto plugin = ph->load();
         if (plugin == NULL)
         {
             fprintf(stderr, "The plugin is not loaded correctly\n");
             continue;
         }
         fprintf(stderr, "Plugin loaded\n");
-        fprintf(stderr, "Auto loaded plugin: %s, version: %s\n", ph.get_name().c_str(), ph.get_version().c_str());
+        fprintf(stderr, "Auto loaded plugin: %s, version: %s\n", ph->get_name().c_str(), ph->get_version().c_str());
         fprintf(stderr, "Running plugins command method:\n");
         fprintf(stderr, "%s\n", plugin->command("Command here", "options here").c_str());
+
+        // delete ph;
     }
+
     return 0;
 }

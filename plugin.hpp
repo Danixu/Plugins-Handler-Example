@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 
   This header file is the virtual plugin definition which will be used in derivated plugins and main program
@@ -11,17 +13,22 @@
 class Plugin
 {
 public:
-    Plugin(){};
-    virtual ~Plugin(){};
-    virtual std::string command(std::string command, std::string options) { return ""; }
+    virtual ~Plugin() = default;
+    virtual std::string command(std::string command, std::string options) = 0;
 };
 
 #define DEFINE_PLUGIN(classType, pluginName, pluginVersion) \
     extern "C"                                              \
     {                                                       \
-        std::shared_ptr<Plugin> SHARED_EXPORT load()        \
+        SHARED_EXPORT classType *load()                     \
         {                                                   \
-            return std::make_shared<classType>();           \
+            printf("Creating new class pointer\n");         \
+            return new classType();                         \
+        }                                                   \
+                                                            \
+        SHARED_EXPORT void unload(classType *ptr)           \
+        {                                                   \
+            delete ptr;                                     \
         }                                                   \
                                                             \
         const char SHARED_EXPORT *name()                    \
