@@ -10,6 +10,12 @@
 #include <string>
 #include <memory>
 
+enum PluginType
+{
+    PTInput = 1,
+    PTOutput
+};
+
 class Plugin
 {
 public:
@@ -17,27 +23,32 @@ public:
     virtual std::string command(std::string command, std::string options) = 0;
 };
 
-#define DEFINE_PLUGIN(classType, pluginName, pluginVersion) \
-    extern "C"                                              \
-    {                                                       \
-        SHARED_EXPORT classType *load()                     \
-        {                                                   \
-            printf("Creating new class pointer\n");         \
-            return new classType();                         \
-        }                                                   \
-                                                            \
-        SHARED_EXPORT void unload(classType *ptr)           \
-        {                                                   \
-            delete ptr;                                     \
-        }                                                   \
-                                                            \
-        const char SHARED_EXPORT *name()                    \
-        {                                                   \
-            return pluginName;                              \
-        }                                                   \
-                                                            \
-        const char SHARED_EXPORT *version()                 \
-        {                                                   \
-            return pluginVersion;                           \
-        }                                                   \
+#define DEFINE_PLUGIN(classType, PType, pluginName, pluginVersion) \
+    extern "C"                                                     \
+    {                                                              \
+        SHARED_EXPORT classType *load()                            \
+        {                                                          \
+            printf("Creating new class pointer\n");                \
+            return new classType();                                \
+        }                                                          \
+                                                                   \
+        SHARED_EXPORT void unload(classType *ptr)                  \
+        {                                                          \
+            delete ptr;                                            \
+        }                                                          \
+                                                                   \
+        SHARED_EXPORT PluginType get_type()                        \
+        {                                                          \
+            return PType;                                          \
+        }                                                          \
+                                                                   \
+        const char SHARED_EXPORT *name()                           \
+        {                                                          \
+            return pluginName;                                     \
+        }                                                          \
+                                                                   \
+        const char SHARED_EXPORT *version()                        \
+        {                                                          \
+            return pluginVersion;                                  \
+        }                                                          \
     }

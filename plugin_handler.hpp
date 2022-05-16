@@ -8,9 +8,11 @@ class PluginHandler
     using allocClass = Plugin *(*)();
     using deleteClass = void (*)(Plugin *);
     using charPReturn = char *(*)();
+    using PTReturn = PluginType (*)();
 
     allocClass _load = NULL;
     deleteClass _unload = NULL;
+    PTReturn _get_type;
     void *handle;
     charPReturn _get_name = NULL;
     charPReturn _get_version = NULL;
@@ -44,7 +46,14 @@ public:
         _unload = reinterpret_cast<deleteClass>(dlsym(handle, "unload"));
         if ((last_error = dlerror()) != NULL)
         {
-            fprintf(stderr, "Error getting the load symbol in the %s lib:\n%s\n", name.c_str(), last_error);
+            fprintf(stderr, "Error getting the unload symbol in the %s lib:\n%s\n", name.c_str(), last_error);
+            return;
+        }
+
+        _get_type = reinterpret_cast<PTReturn>(dlsym(handle, "get_type"));
+        if ((last_error = dlerror()) != NULL)
+        {
+            fprintf(stderr, "Error getting the get_type symbol in the %s lib:\n%s\n", name.c_str(), last_error);
             return;
         }
 
@@ -106,6 +115,11 @@ public:
         {
             _unload(instance.get());
         }
+    }
+
+    PluginType get_type()
+    {
+        return _get_type();
     }
 
     bool has_error()

@@ -27,7 +27,7 @@ int main()
             continue;
         }
         fprintf(stderr, "Plugin loaded\n");
-        fprintf(stderr, "Auto loaded plugin: %s, version: %s\n", ph->get_name().c_str(), ph->get_version().c_str());
+        fprintf(stderr, "Auto loaded plugin: %s, version: %s, type: %d\n", ph->get_name().c_str(), ph->get_version().c_str(), ph->get_type());
         fprintf(stderr, "Running plugins command method:\n");
         fprintf(stderr, "%s\n", plugin->command("Command here", "options here").c_str());
 

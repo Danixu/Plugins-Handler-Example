@@ -10,4 +10,4 @@ public:
     }
 };
 
-DEFINE_PLUGIN(Plugin1, "Plugin1", "0.0.1")
+DEFINE_PLUGIN(Plugin1, PTInput, "Plugin1", "0.0.1")
