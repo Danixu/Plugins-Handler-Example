@@ -23,7 +23,13 @@ class PluginHandler
 public:
     PluginHandler(std::string name)
     {
+// Visual studio fix
+#if defined _MSC_VER
+        std::wstring namew(name.begin(), name.end());
+        if (!(handle = LIBLOAD(namew.c_str())))
+#else
         if (!(handle = LIBLOAD(name.c_str())))
+#endif
         {
             last_error = dlerror();
 
