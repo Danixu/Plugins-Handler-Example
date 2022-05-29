@@ -25,7 +25,8 @@
             "defines": [
                 "__WXMSW__",
                 "_UNICODE",
-                "_DEBUG"
+                "_DEBUG",
+                "BUILD_LIB"
             ],
             "compilerPath": "cl.exe",
             "cStandard": "c11",
