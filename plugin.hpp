@@ -10,6 +10,8 @@
 #include <string>
 #include <memory>
 
+#ifndef _PLUGIN_HPP_H_
+#define _PLUGIN_HPP_H_
 enum PluginType
 {
     PTInput = 1,
@@ -52,3 +54,5 @@ public:
             return pluginVersion;                                  \
         }                                                          \
     }
+
+#endif // _PLUGIN_HPP_H_

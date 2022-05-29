@@ -1,18 +1,14 @@
 #!/bin/bash
 
 # Linux version
-
-# Compile the library
-g++ -fPIC -c plugin1.cpp -o plugin1.o
-g++ -shared -o plugins/plugin1.so plugin1.o
-
-g++ main.cpp -ldl -std=c++17 -o main
+# Compile the library. Linux version doesn't requires the export.cpp file because there are no replaced functions.
+g++ -fPIC -shared -o plugins/plugin1.so plugin1.cpp
+# Main program
+g++ main.cpp plugin_handler.cpp -ldl -std=c++17 -o main
 
 
 # Windows version
-
-# Compile the library
-x86_64-w64-mingw32-g++ -fPIC -DBUILD_LIB -g -static-libgcc -static-libstdc++ -c plugin1.cpp -o plugin1.o
-x86_64-w64-mingw32-g++ -DBUILD_LIB -g -shared -static-libgcc -static-libstdc++ -o plugins/plugin1.dll plugin1.o
-
-x86_64-w64-mingw32-g++ main.cpp -g -static-libgcc -static-libstdc++ -std=c++17 -o main.exe
+# Compile the library. dlerror function is replaced in windows, so export.cpp is required
+x86_64-w64-mingw32-g++ -fPIC -shared -DBUILD_LIB -static-libgcc -static-libstdc++ -o plugins/plugin1.dll export.cpp plugin1.cpp
+# Main Program
+x86_64-w64-mingw32-g++ export.cpp main.cpp plugin_handler.cpp -static-libgcc -static-libstdc++ -std=c++17 -o main.exe
