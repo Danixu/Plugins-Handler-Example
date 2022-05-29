@@ -11,4 +11,4 @@ g++ main.cpp plugin_handler.cpp -ldl -std=c++17 -o main
 # Compile the library. dlerror function is replaced in windows, so export.cpp is required
 x86_64-w64-mingw32-g++ -fPIC -shared -DBUILD_LIB -static-libgcc -static-libstdc++ -o plugins/plugin1.dll export.cpp plugin1.cpp
 # Main Program
-x86_64-w64-mingw32-g++ export.cpp main.cpp plugin_handler.cpp -static-libgcc -static-libstdc++ -std=c++17 -o main.exe
+x86_64-w64-mingw32-g++ export.cpp plugin_handler.cpp main.cpp -static-libgcc -static-libstdc++ -std=c++17 -o main.exe

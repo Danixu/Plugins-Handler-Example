@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 #include <iostream>
 
-class SHARED_EXPORT Plugin1 : public Plugin
+class Plugin1 : public Plugin
 {
 public:
     virtual std::string command(std::string command, std::string options)

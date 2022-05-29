@@ -14,13 +14,15 @@
 #define _PLUGIN_HPP_H_
 enum PluginType
 {
-    PTInput = 1,
+    PTAll = 0,
+    PTInput,
     PTOutput
 };
 
 class Plugin
 {
 public:
+    Plugin() = default;
     virtual ~Plugin() = default;
     virtual std::string command(std::string command, std::string options) = 0;
 };
@@ -28,18 +30,17 @@ public:
 #define DEFINE_PLUGIN(classType, PType, pluginName, pluginVersion) \
     extern "C"                                                     \
     {                                                              \
-        SHARED_EXPORT classType *load()                            \
+        classType SHARED_EXPORT *load()                            \
         {                                                          \
-            printf("Creating new class pointer\n");                \
             return new classType();                                \
         }                                                          \
                                                                    \
-        SHARED_EXPORT void unload(classType *ptr)                  \
+        void SHARED_EXPORT unload(classType *ptr)                  \
         {                                                          \
             delete ptr;                                            \
         }                                                          \
                                                                    \
-        SHARED_EXPORT PluginType get_type()                        \
+        PluginType SHARED_EXPORT get_type()                        \
         {                                                          \
             return PType;                                          \
         }                                                          \

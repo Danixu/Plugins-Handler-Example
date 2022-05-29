@@ -1,8 +1,10 @@
+#include <cstring>
 #include <string>
 #include <vector>
-#include "plugin.hpp"
 #include <filesystem>
 #include <memory>
+
+#include "plugin.hpp"
 
 #ifndef _PLUGIN_HANDLER_H_
 #define _PLUGIN_HANDLER_H_
@@ -10,19 +12,19 @@
 class PluginHandler
 {
     using allocClass = Plugin *(*)();
-    using deleteClass = void (*)(Plugin *);
     using charPReturn = char *(*)();
     using PTReturn = PluginType (*)();
 
     allocClass _load = NULL;
-    deleteClass _unload = NULL;
     PTReturn _get_type;
-    void *handle;
     charPReturn _get_name = NULL;
     charPReturn _get_version = NULL;
     char *last_error = NULL;
 
-    std::shared_ptr<Plugin> instance;
+    void *handle = NULL;
+    Plugin *instance = NULL;
+
+    void set_error(char *error_text);
 
 public:
     PluginHandler(std::string name);
@@ -30,15 +32,12 @@ public:
 
     std::string get_name();
     std::string get_version();
-    std::shared_ptr<Plugin> load();
-    void unload();
+    Plugin *load();
     PluginType get_type();
     bool has_error();
     char *get_error();
-    // Use it under your risk... If an error was set maybe something happens.
     void clear_error();
 };
 
-std::vector<PluginHandler *> load_plugins(std::string path, std::string extension);
-
-#endif
+std::vector<std::shared_ptr<PluginHandler>> load_plugins(std::string path, std::string extension, PluginType type = (PluginType)0);
+#endif // _PLUGIN_HANDLER_H_
