@@ -3,7 +3,9 @@
         {
             "name": "Windows",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/common/include/*",
+                "${workspaceFolder}/method1/include/*",
+                "${workspaceFolder}/method2/include/*"
             ],
             "defines": [
                 "__WXMSW__",
@@ -19,7 +21,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/common/include/*",
+                "${workspaceFolder}/method1/include/*",
+                "${workspaceFolder}/method2/include/*"
             ],
             "defines": [
                 "__WXGTK__"
