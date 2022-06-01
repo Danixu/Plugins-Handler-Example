@@ -35,5 +35,7 @@ int main()
         fprintf(stderr, "%s\n", ph->command((char *)command, (char *)options).c_str());
     }
 
+    fprintf(stderr, "Finished... Closing the app.\n");
+
     return 0;
 }

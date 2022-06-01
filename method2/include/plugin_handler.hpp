@@ -22,11 +22,13 @@ private:
     using allocClass = void *(*)();
     using charPReturn = char *(*)();
     using unloadBoolReturn = bool (*)(void *);
+    using freechararrayBoolReturn = bool (*)(char *);
     using PTReturn = PluginType (*)();
     using commandReturn = char *(*)(void *, char *, char *);
 
     allocClass _load = NULL;
     unloadBoolReturn _unload = NULL;
+    freechararrayBoolReturn _freechararray = NULL;
     PTReturn _get_type;
     charPReturn _get_name = NULL;
     charPReturn _get_version = NULL;

@@ -16,14 +16,19 @@ extern "C"
         return (void *)plugin;
     }
 
+    void SHARED_EXPORT freechararray(char *ptr)
+    {
+        delete[] ptr;
+    }
+
     void SHARED_EXPORT unload(void *ptr)
     {
         delete (Plugin1 *)ptr;
     }
 
-    uint8_t SHARED_EXPORT get_type()
+    int SHARED_EXPORT get_type()
     {
-        return (uint8_t)PTInput;
+        return PTInput;
     }
 
     const char SHARED_EXPORT *name()

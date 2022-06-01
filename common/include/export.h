@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <string>
 
-#define LIBLOAD(x) LoadLibrary(x)
+#define LIBLOAD(x) LoadLibrary((LPCSTR)x)
 #define dlclose(x) FreeLibrary((HMODULE)x)
 #define dlsym(x, y) GetProcAddress((HINSTANCE)x, y)
 char *dlerror();

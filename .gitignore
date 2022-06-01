@@ -2,4 +2,6 @@
 **.o
 **.dll
 **.exe
-main
+**.obj
+**.lib
+**/build/

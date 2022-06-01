@@ -39,6 +39,14 @@ PluginHandler::PluginHandler(std::string name)
 		return;
 	}
 
+	_freechararray = reinterpret_cast<freechararrayBoolReturn>(dlsym(handle, "freechararray"));
+	if (_load == NULL)
+	{
+		set_error(dlerror());
+		fprintf(stderr, "Error getting the unload symbol in the %s lib:\n%s\n", name.c_str(), last_error);
+		return;
+	}
+
 	_get_type = reinterpret_cast<PTReturn>(dlsym(handle, "get_type"));
 	if (_get_type == NULL)
 	{
@@ -82,7 +90,9 @@ PluginHandler::~PluginHandler()
 
 	if (command_output != NULL)
 	{
-		delete[] command_output;
+		// delete[] command_output; // Cannot be freed outside the plugin
+		_freechararray(command_output);
+		command_output = NULL;
 	}
 
 	// If an instance was loaded, delete it
@@ -142,7 +152,7 @@ std::string PluginHandler::get_version()
 
 PluginType PluginHandler::get_type()
 {
-	return _get_type();
+	return (PluginType)_get_type();
 }
 
 std::string PluginHandler::command(char *command, char *options)
@@ -150,6 +160,7 @@ std::string PluginHandler::command(char *command, char *options)
 	if (command_output != NULL)
 	{
 		delete[] command_output;
+		command_output = NULL;
 	}
 	command_output = _command(instance, command, options);
 	return std::string(command_output);
